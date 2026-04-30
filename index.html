@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WebBox V22 - Vibrant Visuals</title>
+    <title>WebBox V23 - Coastal Warfare</title>
     <style>
         body { margin: 0; display: flex; background: #111; color: white; font-family: sans-serif; overflow: hidden; user-select: none; }
         
-        #start-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #start-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         .modal { background: linear-gradient(145deg, #1a1a1a, #0a0a0a); padding: 50px; border-radius: 12px; border: 2px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-width: 600px; width: 90%; }
         .modal h1 { color: #f1c40f; margin-top: 0; font-size: 3em; text-transform: uppercase; letter-spacing: 3px; text-shadow: 2px 2px 0px #000; }
         .modal p { color: #ddd; line-height: 1.6; font-size: 1.1em; margin-bottom: 25px; }
@@ -17,7 +17,7 @@
         .play-btn:hover { background: #2ecc71; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.5); }
 
         #sidebar { width: 280px; background: #1a1a1a; height: 100vh; padding: 15px; box-sizing: border-box; border-right: 3px solid #444; overflow-y: auto; z-index: 10; }
-        #gameCanvas { flex-grow: 1; background: #2d5a27; cursor: crosshair; }
+        #gameCanvas { flex-grow: 1; cursor: crosshair; }
         button { width: 100%; padding: 6px; margin-bottom: 4px; cursor: pointer; background: #333; color: white; border: 1px solid #555; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
         button:hover { background: #444; }
         button.active { background: #e67e22; border-color: #f1c40f; }
@@ -34,17 +34,17 @@
     <div id="start-screen">
         <div class="modal">
             <h1>WebBox</h1>
-            <p>V22 Vibrant Visuals Update! Neon magic, explosive screen shakes, floating damage numbers, and massive anime clashes.</p>
+            <p>V23 Coastal Update! The map is now split into Ocean, Beach, and Plains. Units in the water for 5 seconds gain 4x swimming speed!</p>
             <div class="credits">
                 <p>Developed by: <span>Scourge/SFH/Falah</span></p>
-                <p>Version: <span>22.0 (Vibrant Visuals)</span></p>
+                <p>Version: <span>23.0 (Coastal Warfare)</span></p>
             </div>
             <button class="play-btn" onclick="startGame()">Play Game</button>
         </div>
     </div>
 
     <div id="sidebar">
-        <h2>WEBBOX V22</h2>
+        <h2>WEBBOX V23</h2>
         <div class="stat-panel">
             <b style="font-size:1.1em">Total Units: <span id="total-count" style="color:#2ecc71">0</span></b><br>
             Tool: <span id="current-tool" style="color:#f1c40f;">Normal</span>
@@ -87,7 +87,7 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
-        // --- 1. ENGINE & GLOBALS ---
+        // --- ENGINE & GLOBALS ---
         const cvs = document.getElementById('gameCanvas');
         const ctx = cvs.getContext('2d');
         var ppl = [], projs = [], bldgs = [], particles = [], dmgTexts = [];
@@ -146,7 +146,7 @@
             }
         });
 
-        // --- 2. VFX & PROJECTILES ---
+        // --- VFX & PROJECTILES ---
         class FloatTxt {
             constructor(x,y,txt) { this.x=x; this.y=y; this.txt=txt; this.l=40; this.vy=-1.5; }
             update() { this.y+=this.vy; this.l--; }
@@ -197,7 +197,7 @@
             }
         }
 
-        // --- 3. BUILDINGS & UNITS ---
+        // --- BUILDINGS & UNITS ---
         class Bldg {
             constructor(x,y,t,typ) { this.x=x; this.y=y; this.t=t; this.typ=typ; }
             draw() {
@@ -222,6 +222,7 @@
                 this.frz=0; this.blnd=0; this.ft=0; this.cd=0; this.pCd=0; this.dT=0;
                 this.nO = Math.random()>0.5?1:-1; this.wA = Math.random()*Math.PI*2; this.aA = 0; this.vx=0; this.vy=0;
                 this.pTmr=0; this.pX=0; this.pY=0; this.kUse=false; this.kTmr=0; this.gTmr=0; this.gAtk=0;
+                this.wTmr=0; this.isSwim=false; // Water Mechanics
             }
             draw() {
                 let bs=this.r==='elephant'?30:(this.r==='cannon'?15:(this.r==='kurama'?40:12));
@@ -286,13 +287,26 @@
 
             update() {
                 if(this.cd>0) this.cd--; if(this.pCd>0) this.pCd--; if(this.dT>0) this.dT--; this.age++;
+                
+                // --- WATER MECHANIC ---
+                let wLimit = cvs.height * 0.3; // Top 30% is water
+                if(this.y < wLimit) {
+                    this.wTmr++;
+                    if(this.wTmr > 300) { 
+                        this.isSwim = true; 
+                        if(Math.random() > 0.7 && this.vx !== 0) particles.push(new Part(this.x, this.y, '#74b9ff')); 
+                    }
+                } else {
+                    this.wTmr = 0; this.isSwim = false;
+                }
+
                 let pop = ppl.filter(p=>p.t===this.t).length;
 
                 if(!wallOpen && civOn && !this.isA && this.r!=='cannon' && this.r!=='kurama') {
                     if(!this.task) {
-                        if(this.age>100 && this.age%300===0 && this.r!=='elephant' && pop<50) this.task='house';
-                        else if(this.age>180 && !this.wpn && this.r!=='elephant' && !this.cW) {this.task='stonebox';this.cW=true;}
-                        else if(this.age>600 && !(this.hF||this.hI||this.hW||this.hL) && !this.cP) {this.task='shrine';this.cP=true;}
+                        if(this.age>100 && this.age%300===0 && this.r!=='elephant' && pop<50 && this.y > wLimit) this.task='house'; // Don't build in water
+                        else if(this.age>180 && !this.wpn && this.r!=='elephant' && !this.cW && this.y > wLimit) {this.task='stonebox';this.cW=true;}
+                        else if(this.age>600 && !(this.hF||this.hI||this.hW||this.hL) && !this.cP && this.y > wLimit) {this.task='shrine';this.cP=true;}
                         else if(this.age===480 && this.r==='normal') { let rls=['archer','knight','ninja']; this.r=rls[Math.floor(Math.random()*rls.length)]; if(this.r==='knight'){this.mHp=150;this.hp=150;} }
                     }
                     if(this.task) {
@@ -312,7 +326,7 @@
                                 }
                             }
                         }
-                    } else { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
+                    } else { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; if(this.isSwim) ws*=4; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
                 }
 
                 let nE=null, mD=Infinity;
@@ -325,6 +339,8 @@
 
                 let sL = this.isA?4.5:(this.r==='cannon'?0.5:(this.r==='elephant'?2.85:(this.r==='knight'?4.0:3.0)));
                 if(this.r==='goku') sL=6.0; if(this.r==='kurama') sL=2.0; if(this.dT>0) sL=15.0;
+                
+                if(this.isSwim && this.frz<=0) sL *= 4; // Massive speed boost in water!
 
                 if(nE) {
                     let a = Math.atan2(nE.y-this.y, nE.x-this.x); this.aA = a;
@@ -356,8 +372,8 @@
                     } else if(this.r==='knight' && this.hp<30) { this.vx-=Math.cos(a)*0.4; this.vy-=Math.sin(a)*0.4; }
                     else if(this.r==='ninja') { if(mD<60 && mD>30){ let oA=a+(Math.PI/2)*this.nO; this.vx+=Math.cos(oA)*0.6; this.vy+=Math.sin(oA)*0.6; }else{ this.vx+=Math.cos(a)*0.4; this.vy+=Math.sin(a)*0.4; } }
                     else if(this.r==='archer') { if(mD<300 && (wallOpen||Math.abs(this.x-nE.x)>30)){ if(this.cd<=0){ projs.push(new Proj(this.x,this.y,nE,8,this.t,'normal')); this.cd=50;} if(mD<120){this.vx-=Math.cos(a)*0.3; this.vy-=Math.sin(a)*0.3;} }else{ this.vx+=Math.cos(a)*0.2; this.vy+=Math.sin(a)*0.2; } }
-                    else if(this.dT<=0 && this.r!=='cannon') { let ac=this.r==='elephant'?0.18:(this.isA?0.3:0.2); if(this.r==='kurama')ac=0.1; this.vx+=Math.cos(a)*ac; this.vy+=Math.sin(a)*ac; }
-                } else if((wallOpen||this.isA) && this.r!=='cannon') { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
+                    else if(this.dT<=0 && this.r!=='cannon') { let ac=this.r==='elephant'?0.18:(this.isA?0.3:0.2); if(this.r==='kurama')ac=0.1; if(this.isSwim)ac*=4; this.vx+=Math.cos(a)*ac; this.vy+=Math.sin(a)*ac; }
+                } else if((wallOpen||this.isA) && this.r!=='cannon') { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; if(this.isSwim) ws*=4; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
 
                 this.vx*=0.88; this.vy*=0.88; if(this.frz>0) sL=0.4; let spd=Math.hypot(this.vx,this.vy); if(spd>sL){this.vx=(this.vx/spd)*sL; this.vy=(this.vy/spd)*sL;}
                 this.x+=this.vx; this.y+=this.vy; if(this.frz>0) this.frz--;
@@ -381,16 +397,39 @@
             }
         }
 
-        // --- 4. GAME LOOP ---
+        // --- GAME LOOP & MAP RENDERING ---
         function animate() {
             ctx.save();
             if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*15, (Math.random()-0.5)*15); shakeTime--; }
 
-            ctx.fillStyle = '#2d5a27'; ctx.fillRect(0, 0, cvs.width, cvs.height); 
+            // Dynamic Coastal Map Render
+            let wH = cvs.height * 0.3;  // Water Height (Top 30%)
+            let sH = cvs.height * 0.55; // Sand Height (Next 25%)
+
+            // 1. Water Layer
+            ctx.fillStyle = '#0984e3'; ctx.fillRect(0, 0, cvs.width, wH);
+            // Animated Waves
+            let t = Date.now() / 300;
+            ctx.fillStyle = '#74b9ff'; ctx.globalAlpha = 0.4;
+            for(let i=0; i<cvs.width; i+=40) {
+                ctx.beginPath(); 
+                ctx.arc(i + (Math.sin(t + i*0.05)*10), wH + (Math.cos(t + i*0.05)*5) - 10, 20, 0, Math.PI); 
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // 2. Sand Layer
+            ctx.fillStyle = '#ffeaa7'; ctx.fillRect(0, wH, cvs.width, sH - wH);
+
+            // 3. Plains Layer
+            ctx.fillStyle = '#2d5a27'; ctx.fillRect(0, sH, cvs.width, cvs.height - sH);
+            
+            // Grid Overlay
             ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1;
             for(let i=0; i<cvs.width; i+=50){ ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, cvs.height); ctx.stroke(); } 
             for(let j=0; j<cvs.height; j+=50){ ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(cvs.width, j); ctx.stroke(); }
             
+            // Peace Wall
             if(!wallOpen){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(cvs.width/2 - 5, 0, 10, cvs.height); }
             
             bldgs.forEach(b => b.draw()); 
