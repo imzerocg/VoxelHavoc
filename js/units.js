@@ -1,5 +1,3 @@
-// js/units.js
-
 class Person {
     constructor(x,y,tm,r) {
         this.x=x; this.y=y; this.t=tm; this.r=r; 
@@ -11,14 +9,15 @@ class Person {
         this.frz=0; this.blnd=0; this.ft=0; this.cd=0; this.pCd=0; this.dT=0;
         this.nO = Math.random()>0.5?1:-1; this.wA = Math.random()*Math.PI*2; this.aA = 0; this.vx=0; this.vy=0;
         this.pTmr=0; this.pX=0; this.pY=0; this.kUse=false; this.kTmr=0; this.gTmr=0; this.gAtk=0;
+        this.wTmr=0; this.isSwim=false; 
     }
+    
     draw() {
-        let bs=this.r==='elephant'?30:(this.r==='cannon'?15:(this.r==='kurama'?40:12));
+        let bs = this.r==='elephant'?30:(this.r==='cannon'?15:(this.r==='kurama'?40:12));
         ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(this.x,this.y+bs,bs,bs/2,0,0,Math.PI*2); ctx.fill();
         ctx.save();
-        ctx.fillStyle=this.ft>0?'white':(colors[this.t]||'#fff');
+        ctx.fillStyle = this.ft>0 ? 'white' : (colors[this.t]||'#fff');
         
-        // Neon Glow for Magic
         if(this.ft<=0 && this.hF) { ctx.fillStyle='#ff4500'; ctx.shadowBlur=15; ctx.shadowColor='#ff4500'; } 
         if(this.ft<=0 && this.hI) { ctx.fillStyle='#a0e7ff'; ctx.shadowBlur=15; ctx.shadowColor='#a0e7ff'; }
         
@@ -65,7 +64,7 @@ class Person {
         }
 
         let aS = this.r==='elephant'?60:(this.r==='cannon'?0:40);
-        ctx.shadowBlur = 0; // Reset shadow for accessories
+        ctx.shadowBlur = 0; 
         if(aS>0){ ctx.lineWidth=3; if(this.hL){ctx.shadowBlur=15; ctx.shadowColor='#f1c40f'; ctx.strokeStyle='#f1c40f'; ctx.beginPath(); ctx.arc(this.x,this.y,aS+4,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur=0;} if(this.hW){ctx.strokeStyle='rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(this.x,this.y,aS,0,Math.PI*2); ctx.stroke();} }
         if(this.blnd>0){ ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(this.x,this.y-(this.r==='elephant'?40:28),10,0,Math.PI*2); ctx.fill(); }
         if(this.wpn && !this.isA && this.r!=='elephant' && this.r!=='cannon' && this.r!=='knight' && this.r!=='archer'){ ctx.strokeStyle='#ecf0f1'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(this.x,this.y); ctx.lineTo(this.x+Math.cos(this.aA)*(this.wpn==='spear'?40:24),this.y+Math.sin(this.aA)*(this.wpn==='spear'?40:24)); ctx.stroke(); }
@@ -76,13 +75,25 @@ class Person {
 
     update() {
         if(this.cd>0) this.cd--; if(this.pCd>0) this.pCd--; if(this.dT>0) this.dT--; this.age++;
+        
+        let wLimit = cvs.height * 0.3; 
+        if(this.y < wLimit) {
+            this.wTmr++;
+            if(this.wTmr > 300) { 
+                this.isSwim = true; 
+                if(Math.random() > 0.7 && this.vx !== 0) particles.push(new Part(this.x, this.y, '#74b9ff')); 
+            }
+        } else {
+            this.wTmr = 0; this.isSwim = false;
+        }
+
         let pop = ppl.filter(p=>p.t===this.t).length;
 
         if(!wallOpen && civOn && !this.isA && this.r!=='cannon' && this.r!=='kurama') {
             if(!this.task) {
-                if(this.age>100 && this.age%300===0 && this.r!=='elephant' && pop<50) this.task='house';
-                else if(this.age>180 && !this.wpn && this.r!=='elephant' && !this.cW) {this.task='stonebox';this.cW=true;}
-                else if(this.age>600 && !(this.hF||this.hI||this.hW||this.hL) && !this.cP) {this.task='shrine';this.cP=true;}
+                if(this.age>100 && this.age%300===0 && this.r!=='elephant' && pop<50 && this.y > wLimit) this.task='house';
+                else if(this.age>180 && !this.wpn && this.r!=='elephant' && !this.cW && this.y > wLimit) {this.task='stonebox';this.cW=true;}
+                else if(this.age>600 && !(this.hF||this.hI||this.hW||this.hL) && !this.cP && this.y > wLimit) {this.task='shrine';this.cP=true;}
                 else if(this.age===480 && this.r==='normal') { let rls=['archer','knight','ninja']; this.r=rls[Math.floor(Math.random()*rls.length)]; if(this.r==='knight'){this.mHp=150;this.hp=150;} }
             }
             if(this.task) {
@@ -102,7 +113,7 @@ class Person {
                         }
                     }
                 }
-            } else { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
+            } else { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; if(this.isSwim) ws*=4; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
         }
 
         let nE=null, mD=Infinity;
@@ -115,17 +126,18 @@ class Person {
 
         let sL = this.isA?4.5:(this.r==='cannon'?0.5:(this.r==='elephant'?2.85:(this.r==='knight'?4.0:3.0)));
         if(this.r==='goku') sL=6.0; if(this.r==='kurama') sL=2.0; if(this.dT>0) sL=15.0;
+        if(this.isSwim && this.frz<=0) sL *= 4; 
 
         if(nE) {
             let a = Math.atan2(nE.y-this.y, nE.x-this.x); this.aA = a;
             if(this.r==='luffy' && mD<cvs.width/2 && this.cd<=0) { this.pX=nE.x; this.pY=nE.y; this.pTmr=15; this.cd=300; nE.hp-=150; nE.ft=10; addVFX(nE.x, nE.y, 150); nE.vx+=Math.cos(a)*20; nE.vy+=Math.sin(a)*20; }
             if(this.r==='gojo' && mD<300 && this.cd<=0) {
-                this.gTmr=30; this.cd=200; let rl=Math.random(); shakeTime = 20; // Screen Shake!
+                this.gTmr=30; this.cd=200; let rl=Math.random(); shakeTime = 20; 
                 if(rl<0.33) { this.gAtk=1; ppl.forEach(p=>{if(p.t!==this.t&&Math.hypot(this.x-p.x,this.y-p.y)<150){p.hp-=80; addVFX(p.x, p.y, 80); let ang=Math.atan2(p.y-this.y,p.x-this.x); p.vx+=Math.cos(ang)*25; p.vy+=Math.sin(ang)*25;}}); }
                 else if(rl<0.66) { this.gAtk=2; ppl.forEach(p=>{if(p.t!==this.t&&Math.hypot(this.x-p.x,this.y-p.y)<250){p.hp-=50; addVFX(p.x, p.y, 50); let ang=Math.atan2(p.y-this.y,p.x-this.x); p.vx-=Math.cos(ang)*20; p.vy-=Math.sin(ang)*20;}}); }
                 else { this.gAtk=3; ppl.forEach(p=>{if(p.t!==this.t&&Math.abs(p.y-this.y)<60) { p.hp-=300; addVFX(p.x, p.y, 300); }}); }
             }
-            if(this.r==='goku' && mD<400 && !this.kUse) { this.kUse=true; this.kTmr=60; shakeTime = 30; // Screen Shake!
+            if(this.r==='goku' && mD<400 && !this.kUse) { this.kUse=true; this.kTmr=60; shakeTime = 30; 
                 ppl.forEach(p=>{if(p.t!==this.t&&Math.abs(p.y-this.y)<60) { p.hp-=9999; addVFX(p.x, p.y, 9999); }}); 
             }
             if(this.r==='naruto' && this.cd<=0) { ppl.push(new Person(this.x,this.y,this.t,'kurama')); this.cd=600; shakeTime = 10; }
@@ -146,8 +158,8 @@ class Person {
             } else if(this.r==='knight' && this.hp<30) { this.vx-=Math.cos(a)*0.4; this.vy-=Math.sin(a)*0.4; }
             else if(this.r==='ninja') { if(mD<60 && mD>30){ let oA=a+(Math.PI/2)*this.nO; this.vx+=Math.cos(oA)*0.6; this.vy+=Math.sin(oA)*0.6; }else{ this.vx+=Math.cos(a)*0.4; this.vy+=Math.sin(a)*0.4; } }
             else if(this.r==='archer') { if(mD<300 && (wallOpen||Math.abs(this.x-nE.x)>30)){ if(this.cd<=0){ projs.push(new Proj(this.x,this.y,nE,8,this.t,'normal')); this.cd=50;} if(mD<120){this.vx-=Math.cos(a)*0.3; this.vy-=Math.sin(a)*0.3;} }else{ this.vx+=Math.cos(a)*0.2; this.vy+=Math.sin(a)*0.2; } }
-            else if(this.dT<=0 && this.r!=='cannon') { let ac=this.r==='elephant'?0.18:(this.isA?0.3:0.2); if(this.r==='kurama')ac=0.1; this.vx+=Math.cos(a)*ac; this.vy+=Math.sin(a)*ac; }
-        } else if((wallOpen||this.isA) && this.r!=='cannon') { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
+            else if(this.dT<=0 && this.r!=='cannon') { let ac=this.r==='elephant'?0.18:(this.isA?0.3:0.2); if(this.r==='kurama')ac=0.1; if(this.isSwim)ac*=4; this.vx+=Math.cos(a)*ac; this.vy+=Math.sin(a)*ac; }
+        } else if((wallOpen||this.isA) && this.r!=='cannon') { this.wA+=(Math.random()-0.5)*0.4; let ws=this.r==='elephant'?0.28:0.3; if(this.isSwim) ws*=4; this.vx+=Math.cos(this.wA)*ws; this.vy+=Math.sin(this.wA)*ws; }
 
         this.vx*=0.88; this.vy*=0.88; if(this.frz>0) sL=0.4; let spd=Math.hypot(this.vx,this.vy); if(spd>sL){this.vx=(this.vx/spd)*sL; this.vy=(this.vy/spd)*sL;}
         this.x+=this.vx; this.y+=this.vy; if(this.frz>0) this.frz--;
@@ -155,13 +167,12 @@ class Person {
         if(!wallOpen && !this.isA) { let cx=cvs.width/2, r=this.r==='elephant'?25:15; if(this.t==='blue'&&this.x>cx-r){this.x=cx-r;this.vx*=-0.5;} else if(this.t==='red'&&this.x<cx+r){this.x=cx+r;this.vx*=-0.5;} }
         let rad=this.r==='elephant'?25:(this.r==='kurama'?30:15); if(this.x<rad){this.x=rad;this.vx*=-0.5;} if(this.x>cvs.width-rad){this.x=cvs.width-rad;this.vx*=-0.5;} if(this.y<rad){this.y=rad;this.vy*=-0.5;} if(this.y>cvs.height-rad){this.y=cvs.height-rad;this.vy*=-0.5;}
 
-        // Melee
         if(nE && this.r!=='archer' && this.r!=='cannon' && !['gojo','luffy'].includes(this.r) && this.dT<=0 && this.cd<=0) {
             const d=Math.hypot(this.x-nE.x, this.y-nE.y); let rh=this.r==='elephant'?70:(this.r==='kurama'?60:(this.wpn==='spear'?60:40));
             if(d<rh && (wallOpen || this.isA || nE.isA || Math.abs(this.x-nE.x)>30)) {
                 let dmg=1.0; if(this.r==='elephant')dmg=8.0; if(this.r==='knight')dmg=2.5; if(this.r==='ninja')dmg=1.5; if(this.r==='goku')dmg=15; if(this.r==='naruto')dmg=5; if(this.r==='kurama')dmg=25; if(this.hF)dmg*=1.5; if(this.wpn==='sword')dmg+=1; if(this.wpn==='spear')dmg+=0.8; if(this.hL)dmg+=1.5;
                 nE.hp-=dmg; nE.ft=5; this.cd=this.r==='elephant'?40:(this.r==='kurama'?40:(this.isA?15:25));
-                addVFX(nE.x, nE.y, dmg); // Triggers hit particles and damage text
+                addVFX(nE.x, nE.y, dmg); 
                 
                 let kF=this.r==='elephant'?25:(this.r==='kurama'?20:(this.r==='knight'?12:6)), pR=nE.r==='elephant'?0.2:(nE.r==='cannon'?0:1), aE=Math.atan2(nE.y-this.y,nE.x-this.x);
                 nE.vx+=Math.cos(aE)*kF*pR; nE.vy+=Math.sin(aE)*kF*pR;
