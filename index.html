@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WebBox V23 - Modular Edition</title>
+    <title>Voxel Havoc - Coastal Warfare</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Start Screen UI -->
     <div id="start-screen">
         <div class="modal">
-            <h1>WebBox</h1>
-            <p>V23 Coastal Update! The map is now split into Ocean, Beach, and Plains. Units in the water for 5 seconds gain 4x swimming speed!</p>
+            <h1>Voxel Havoc</h1>
+            <p>Coastal Update! The map is now split into Ocean, Beach, and Plains. Units in the water for 5 seconds gain 4x swimming speed!</p>
             <div class="credits">
                 <p>Developed by: <span>Scourge/SFH/Falah</span></p>
                 <p>Version: <span>23.0 (Coastal Warfare)</span></p>
@@ -19,8 +20,9 @@
         </div>
     </div>
 
+    <!-- Game UI Sidebar -->
     <div id="sidebar">
-        <h2>WEBBOX V23</h2>
+        <h2>VOXEL HAVOC</h2>
         <div class="stat-panel">
             <b style="font-size:1.1em">Total Units: <span id="total-count" style="color:#2ecc71">0</span></b><br>
             Tool: <span id="current-tool" style="color:#f1c40f;">Normal</span>
@@ -60,13 +62,15 @@
         </div>
     </div>
 
+    <!-- Main Canvas -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- CRITICAL: Script Load Order -->
+    <!-- CRITICAL: Modular Script Load Order -->
     <script src="js/globals.js"></script>
     <script src="js/civilization.js"></script>
     <script src="js/others.js"></script>
     <script src="js/units.js"></script>
     <script src="js/engine.js"></script>
+    
 </body>
 </html>
