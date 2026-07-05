@@ -2,47 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Voxel Havoc - Coastal Warfare</title>
+    <title>Voxel Havoc</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Start Screen UI -->
-    <div id="start-screen">
-        <div class="modal">
-            <h1>Voxel Havoc</h1>
-            <p>Coastal Update! The map is now split into Ocean, Beach, and Plains. Units in the water for 5 seconds gain 4x swimming speed!</p>
-            <div class="credits">
-                <p>Developed by: <span>Scourge/SFH/Falah</span></p>
-                <p>Version: <span>23.0 (Coastal Warfare)</span></p>
+    
+    <!-- Start Menu & Blueprint UI -->
+    <div id="ui-layer">
+        <button id="log-btn" class="btn-ui" onclick="showLogs()">Update Logs</button>
+        <div class="main-menu">
+            <h1 style="color: #f1c40f; margin-top: 0; font-size: 2.5em; text-transform: uppercase; letter-spacing: 2px;">Voxel Havoc</h1>
+            
+            <div class="menu-section">
+                <h3>Maps</h3>
+                <div class="grid">
+                    <button class="btn-ui map-btn" onclick="setMap('Volcano')">Volcano</button>
+                    <button class="btn-ui map-btn active" onclick="setMap('Coastal')">Coastal</button>
+                    <button class="btn-ui map-btn" onclick="setMap('Mountains')">Mountains</button>
+                </div>
             </div>
-            <button class="play-btn" onclick="startGame()">Play Game</button>
+
+            <div class="menu-section">
+                <h3>Gamemodes</h3>
+                <div class="grid">
+                    <button class="btn-ui mode-btn active" onclick="setMode('Civilization')">Civilization</button>
+                    <button class="btn-ui mode-btn" onclick="setMode('Normal')">Normal</button>
+                    <button class="btn-ui mode-btn" onclick="setMode('Animal War')">Animal War</button>
+                    <button class="btn-ui mode-btn" onclick="setMode('Modern')">Modern</button>
+                </div>
+            </div>
+
+            <button class="btn-ui play-btn" onclick="startGame()">START HAVOC</button>
         </div>
     </div>
 
-    <!-- Game UI Sidebar -->
-    <div id="sidebar">
+    <!-- Update Logs Modal -->
+    <div id="log-modal">
+        <div class="log-content">
+            <h2 style="color: #3498db; margin-top: 0;">Update Logs</h2>
+            <ul id="log-list" style="text-align: left; color: #ccc; line-height: 1.6;">
+                <li><strong style="color:white">V24.1:</strong> Neon UI Overhaul, Map & Mode Selectors.</li>
+                <li><strong style="color:white">V24:</strong> 4 New Anime Gods, Hotkeys, Battle Speed Slider.</li>
+                <li><strong style="color:white">V23:</strong> Coastal Warfare & Swimming Speed Buff.</li>
+                <li><strong style="color:white">V22:</strong> Vibrant Visuals (Screen shake, Damage text, Hit particles).</li>
+                <li><strong style="color:white">V21:</strong> Modular Codebase & File Splits.</li>
+            </ul>
+            <button class="btn-ui" style="background: #e74c3c; width: 100%; margin-top: 15px;" onclick="hideLogs()">Close</button>
+        </div>
+    </div>
+
+    <!-- Sidebar Game UI (Hidden until Start) -->
+    <div id="sidebar" style="display: none;">
         <h2>VOXEL HAVOC</h2>
         <div class="stat-panel">
             <b style="font-size:1.1em">Total Units: <span id="total-count" style="color:#2ecc71">0</span></b><br>
-            Tool: <span id="current-tool" style="color:#f1c40f;">Normal</span>
+            Tool: <span id="current-tool" style="color:#f1c40f;">Normal</span><br>
+            Map: <span id="current-map-ui" style="color:#3498db;">Coastal</span> | Mode: <span id="current-mode-ui" style="color:#9b59b6;">Civilization</span>
         </div>
         
+        <div style="margin-bottom: 15px;">
+            <label style="font-size: 0.85em; font-weight: bold; color: #ddd;">Battle Speed: <span id="speed-val">1x</span></label>
+            <input type="range" id="speedSlider" min="1" max="5" value="1" style="width: 100%; cursor: pointer;">
+        </div>
+
         <button id="teamToggle" onclick="toggleTeam()" class="team-btn" style="background:#3498db">Team: BLUE</button>
         <div class="grid-2">
-            <button onclick="toggleCiv()" id="civBtn" style="background:#8e44ad">Civ: ON</button>
-            <button onclick="toggleWall()" id="wallBtn" style="background:#c0392b">Wall: CLOSED</button>
+            <button onclick="toggleCiv()" id="civBtn" style="background:#8e44ad">Civ: ON [C]</button>
+            <button onclick="toggleWall()" id="wallBtn" style="background:#c0392b">Wall: CLOSED [Spc]</button>
         </div>
         <hr>
         <div class="grid-2">
-            <button onclick="setPower('spawn-normal', this)" class="active">Normal</button>
-            <button onclick="setPower('spawn-archer', this)">Archer</button>
-            <button onclick="setPower('spawn-knight', this)">Knight</button>
-            <button onclick="setPower('spawn-ninja', this)">Ninja</button>
-            <button onclick="setPower('spawn-swapper', this)">Swapper</button>
-            <button onclick="setPower('spawn-shifter', this)">Shifter</button>
-            <button onclick="setPower('spawn-elephant', this)">Elephant</button>
-            <button onclick="setPower('cannon', this)">Cannon</button>
+            <button onclick="setPower('spawn-normal', this)" class="active">Normal [1]</button>
+            <button onclick="setPower('spawn-archer', this)">Archer [2]</button>
+            <button onclick="setPower('spawn-knight', this)">Knight [3]</button>
+            <button onclick="setPower('spawn-ninja', this)">Ninja [4]</button>
+            <button onclick="setPower('spawn-swapper', this)">Swapper [5]</button>
+            <button onclick="setPower('spawn-shifter', this)">Shifter [6]</button>
+            <button onclick="setPower('spawn-elephant', this)">Elephant [7]</button>
+            <button onclick="setPower('cannon', this)">Cannon [8]</button>
         </div>
         <hr>
         <div class="grid-2">
@@ -50,6 +87,10 @@
             <button onclick="setPower('spawn-gojo', this)" class="anime-btn">Gojo</button>
             <button onclick="setPower('spawn-naruto', this)" class="anime-btn">Naruto</button>
             <button onclick="setPower('spawn-goku', this)" class="anime-btn">Goku</button>
+            <button onclick="setPower('spawn-ichigo', this)" class="anime-btn" style="background:#fff">Ichigo</button>
+            <button onclick="setPower('spawn-zoro', this)" class="anime-btn" style="background:#2ecc71">Zoro</button>
+            <button onclick="setPower('spawn-sukuna', this)" class="anime-btn" style="background:#c0392b; color:white;">Sukuna</button>
+            <button onclick="setPower('spawn-eren', this)" class="anime-btn" style="background:#7f8c8d; color:white;">Eren</button>
         </div>
         <hr>
         <div class="grid-2">
@@ -62,15 +103,12 @@
         </div>
     </div>
 
-    <!-- Main Canvas -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- CRITICAL: Modular Script Load Order -->
     <script src="js/globals.js"></script>
     <script src="js/civilization.js"></script>
     <script src="js/others.js"></script>
     <script src="js/units.js"></script>
     <script src="js/engine.js"></script>
-    
 </body>
 </html>
