@@ -1,19 +1,34 @@
-/* Sidebar UI Overhaul */
-.sidebar-section { margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; }
-.sidebar-section h3 { color: #888; font-size: 0.85em; text-transform: uppercase; margin: 0 0 10px 0; text-align: center; letter-spacing: 1px; }
+body { margin: 0; display: flex; background: #111; color: white; font-family: sans-serif; overflow: hidden; user-select: none; }
 
-.slider-container { background: #222; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #333; }
-.slider-container label { font-size: 0.85em; font-weight: bold; color: #ddd; display: block; margin-bottom: 5px; }
-.slider-container input { width: 100%; cursor: pointer; }
+/* Classic Start Screen */
+#start-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.modal { background: linear-gradient(145deg, #1a1a1a, #0a0a0a); padding: 40px; border-radius: 12px; border: 2px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-width: 500px; width: 90%; }
+.modal h1 { color: #f1c40f; margin-top: 0; font-size: 2.5em; text-transform: uppercase; letter-spacing: 3px; text-shadow: 2px 2px 0px #000; }
 
-#sidebar button { width: 100%; padding: 8px; margin-bottom: 4px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.85em; transition: 0.15s; border: 1px solid transparent; }
-.ctrl-btn { color: white; border-bottom: 3px solid rgba(0,0,0,0.3) !important; }
-.ctrl-btn:hover { filter: brightness(1.2); }
+/* Start Menu Blueprint Grids */
+.menu-section { text-align: left; margin-bottom: 20px; }
+.menu-section h3 { color: #aaa; font-size: 1em; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-.army-btn { background: #222; color: #ccc; border-color: #444 !important; }
-.army-btn:hover { background: #333; color: white; }
-.army-btn.active { background: #e67e22; color: #fff; border-color: #d35400 !important; }
+.play-btn { background: #27ae60; color: white; border: none; padding: 15px; font-size: 1.4em; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; width: 100%; margin-top: 10px; }
+.play-btn:hover { background: #2ecc71; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.5); }
 
-.legend-btn { background: #111; color: white; border: 1px solid #444 !important; }
-.legend-btn:hover { background: #222; border-color: #f1c40f !important; }
-.legend-btn.active { background: #f1c40f; color: #000; border-color: #f39c12 !important; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+/* Classic Sidebar */
+#sidebar { width: 280px; background: #1a1a1a; height: 100vh; padding: 15px; box-sizing: border-box; border-right: 3px solid #444; overflow-y: auto; z-index: 10; display: none; flex-shrink: 0; }
+#gameCanvas { flex-grow: 1; cursor: crosshair; }
+
+button { width: 100%; padding: 6px; margin-bottom: 4px; cursor: pointer; background: #333; color: white; border: 1px solid #555; border-radius: 4px; font-weight: bold; font-size: 0.85em; transition: 0.1s; }
+button:hover { background: #444; }
+button.active { background: #e67e22; border-color: #f1c40f; }
+
+.team-btn { border-width: 2px; }
+.anime-btn { background: #f1c40f; color: #111; border-color: #f39c12; }
+.stat-panel { background: rgba(0,0,0,0.5); padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 0.85em; text-align: center; border: 1px solid #444; }
+h2 { margin: 0 0 5px 0; color: #f1c40f; text-align: center; font-size: 1.2em; }
+hr { border: 0; border-top: 1px solid #444; margin: 8px 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+
+/* Logs */
+#log-btn { position: absolute; top: 15px; right: 15px; width: auto; padding: 8px 15px; background: #8e44ad; z-index: 101; }
+#log-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
+.log-content { background: #1a1a1a; padding: 30px; border-radius: 12px; border: 2px solid #333; width: 500px; max-width: 90%; }
