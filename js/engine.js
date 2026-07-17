@@ -32,7 +32,25 @@ cvs.addEventListener('mousedown', (e) => {
         let tm = ['luffy', 'gojo', 'naruto', 'goku', 'ichigo', 'zoro', 'sukuna', 'eren'].includes(rl) ? rl : teams[tIdx]; 
         if(ppl.filter(p => p.t === tm).length < 150) ppl.push(new Person(x, y, tm, rl)); 
     }
+    else { 
+        ppl.forEach(p => { 
+            if(Math.hypot(p.x - x, p.y - y) < (p.r === 'elephant' ? 120 : 100)) { 
+                // Removed all elements. Only Smite remains.
+                if(curPwr === 'strike') { p.hp = 0; p.ft = 10; addVFX(p.x, p.y, 9999); } 
+            }
+        });
+    }
 });
+
+// NEW: Smite All Function
+function smiteAll() {
+    ppl.forEach(p => { p.hp = 0; });
+    shakeTime = 40; // Massive screen shake
+    // Add chaotic hit effects everywhere
+    for(let i=0; i<60; i++) {
+        particles.push(new Part(Math.random()*cvs.width, Math.random()*cvs.height, '#e74c3c'));
+    }
+}
 
 function animate() {
     ctx.save();
