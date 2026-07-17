@@ -32,18 +32,6 @@ cvs.addEventListener('mousedown', (e) => {
         let tm = ['luffy', 'gojo', 'naruto', 'goku', 'ichigo', 'zoro', 'sukuna', 'eren'].includes(rl) ? rl : teams[tIdx]; 
         if(ppl.filter(p => p.t === tm).length < 150) ppl.push(new Person(x, y, tm, rl)); 
     }
-    else { 
-        ppl.forEach(p => { 
-            if(Math.hypot(p.x - x, p.y - y) < (p.r === 'elephant' ? 120 : 100)) { 
-                if(curPwr === 'fire') { p.hF = true; p.hI = p.hL = p.hW = false; } 
-                if(curPwr === 'ice') { p.hI = true; p.hF = p.hL = p.hW = false; } 
-                if(curPwr === 'light') { p.hL = true; p.hF = p.hI = p.hW = false; } 
-                if(curPwr === 'wind') { p.hW = true; p.hF = p.hI = p.hL = false; } 
-                if(curPwr === 'weapon' && !p.isA && p.r !== 'elephant' && p.r !== 'cannon') p.wpn = Math.random() > 0.5 ? 'sword' : 'spear'; 
-                if(curPwr === 'strike') { p.hp = 0; p.ft = 10; addVFX(p.x, p.y, 9999); } 
-            }
-        });
-    }
 });
 
 function animate() {
@@ -52,7 +40,6 @@ function animate() {
 
     let wH = cvs.height * 0.3, sH = cvs.height * 0.55; 
 
-    // Render logic per Map 
     if(selectedMap === 'Coastal') {
         ctx.fillStyle = '#0984e3'; ctx.fillRect(0, 0, cvs.width, wH);
         let t = Date.now() / 300;
@@ -76,7 +63,6 @@ function animate() {
         ctx.fillStyle = '#27ae60'; ctx.fillRect(0, sH, cvs.width, cvs.height - sH); 
     }
 
-    // Only process physics and troops if UI is hidden
     if (document.getElementById('ui-layer').style.display === 'none') {
         ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1;
         for(let i=0; i<cvs.width; i+=50){ ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, cvs.height); ctx.stroke(); } 
