@@ -41,65 +41,64 @@
         <div class="log-content">
             <h2 style="color: #3498db; margin-top: 0;">Update Logs</h2>
             <ul id="log-list" style="text-align: left; color: #ccc; line-height: 1.6;">
+                <li><strong style="color:white">V24.2:</strong> Removed Elemental Powers/Extra Teams. Fixed hit-flash bug. Revamped Sidebar UI.</li>
                 <li><strong style="color:white">V24.1:</strong> Neon UI Overhaul, Map & Mode Selectors.</li>
                 <li><strong style="color:white">V24:</strong> 4 New Anime Gods, Hotkeys, Battle Speed Slider.</li>
-                <li><strong style="color:white">V23:</strong> Coastal Warfare & Swimming Speed Buff.</li>
-                <li><strong style="color:white">V22:</strong> Vibrant Visuals (Screen shake, Damage text, Hit particles).</li>
-                <li><strong style="color:white">V21:</strong> Modular Codebase & File Splits.</li>
             </ul>
             <button class="btn-ui" style="background: #e74c3c; width: 100%; margin-top: 15px;" onclick="hideLogs()">Close</button>
         </div>
     </div>
 
-    <!-- Sidebar Game UI (Hidden until Start) -->
+    <!-- NEW REVAMPED SIDEBAR -->
     <div id="sidebar" style="display: none;">
         <h2>VOXEL HAVOC</h2>
+        
         <div class="stat-panel">
-            <b style="font-size:1.1em">Total Units: <span id="total-count" style="color:#2ecc71">0</span></b><br>
-            Tool: <span id="current-tool" style="color:#f1c40f;">Normal</span><br>
-            Map: <span id="current-map-ui" style="color:#3498db;">Coastal</span> | Mode: <span id="current-mode-ui" style="color:#9b59b6;">Civilization</span>
+            <span style="color:#2ecc71; font-weight:bold; font-size:1.2em;">Units: <span id="total-count">0</span></span><br>
+            <span style="color:#aaa; font-size:0.9em;">Map: <span id="current-map-ui" style="color:#3498db;">Coastal</span></span><br>
+            <span style="color:#aaa; font-size:0.9em;">Mode: <span id="current-mode-ui" style="color:#9b59b6;">Civilization</span></span>
         </div>
         
-        <div style="margin-bottom: 15px;">
-            <label style="font-size: 0.85em; font-weight: bold; color: #ddd;">Battle Speed: <span id="speed-val">1x</span></label>
-            <input type="range" id="speedSlider" min="1" max="5" value="1" style="width: 100%; cursor: pointer;">
+        <div class="slider-container">
+            <label>Speed: <span id="speed-val" style="color:#f1c40f">1x</span></label>
+            <input type="range" id="speedSlider" min="1" max="5" value="1">
         </div>
 
-        <button id="teamToggle" onclick="toggleTeam()" class="team-btn" style="background:#3498db">Team: BLUE</button>
-        <div class="grid-2">
-            <button onclick="toggleCiv()" id="civBtn" style="background:#8e44ad">Civ: ON [C]</button>
-            <button onclick="toggleWall()" id="wallBtn" style="background:#c0392b">Wall: CLOSED [Spc]</button>
+        <div class="sidebar-section">
+            <h3>System Controls</h3>
+            <button id="teamToggle" onclick="toggleTeam()" class="ctrl-btn" style="background:#3498db; border-color:#2980b9;">Team: BLUE</button>
+            <div class="grid-2">
+                <button onclick="toggleCiv()" id="civBtn" class="ctrl-btn" style="background:#8e44ad">Civ: ON [C]</button>
+                <button onclick="toggleWall()" id="wallBtn" class="ctrl-btn" style="background:#c0392b">Wall: CLOSED [Spc]</button>
+            </div>
         </div>
-        <hr>
-        <div class="grid-2">
-            <button onclick="setPower('spawn-normal', this)" class="active">Normal [1]</button>
-            <button onclick="setPower('spawn-archer', this)">Archer [2]</button>
-            <button onclick="setPower('spawn-knight', this)">Knight [3]</button>
-            <button onclick="setPower('spawn-ninja', this)">Ninja [4]</button>
-            <button onclick="setPower('spawn-swapper', this)">Swapper [5]</button>
-            <button onclick="setPower('spawn-shifter', this)">Shifter [6]</button>
-            <button onclick="setPower('spawn-elephant', this)">Elephant [7]</button>
-            <button onclick="setPower('cannon', this)">Cannon [8]</button>
+
+        <div class="sidebar-section">
+            <h3>Standard Army</h3>
+            <div class="grid-2">
+                <button onclick="setPower('spawn-normal', this)" class="army-btn active">Normal</button>
+                <button onclick="setPower('spawn-archer', this)" class="army-btn">Archer</button>
+                <button onclick="setPower('spawn-knight', this)" class="army-btn">Knight</button>
+                <button onclick="setPower('spawn-ninja', this)" class="army-btn">Ninja</button>
+                <button onclick="setPower('spawn-swapper', this)" class="army-btn">Swapper</button>
+                <button onclick="setPower('spawn-shifter', this)" class="army-btn">Shifter</button>
+                <button onclick="setPower('spawn-elephant', this)" class="army-btn">Elephant</button>
+                <button onclick="setPower('cannon', this)" class="army-btn">Cannon</button>
+            </div>
         </div>
-        <hr>
-        <div class="grid-2">
-            <button onclick="setPower('spawn-luffy', this)" class="anime-btn">Luffy</button>
-            <button onclick="setPower('spawn-gojo', this)" class="anime-btn">Gojo</button>
-            <button onclick="setPower('spawn-naruto', this)" class="anime-btn">Naruto</button>
-            <button onclick="setPower('spawn-goku', this)" class="anime-btn">Goku</button>
-            <button onclick="setPower('spawn-ichigo', this)" class="anime-btn" style="background:#fff">Ichigo</button>
-            <button onclick="setPower('spawn-zoro', this)" class="anime-btn" style="background:#2ecc71">Zoro</button>
-            <button onclick="setPower('spawn-sukuna', this)" class="anime-btn" style="background:#c0392b; color:white;">Sukuna</button>
-            <button onclick="setPower('spawn-eren', this)" class="anime-btn" style="background:#7f8c8d; color:white;">Eren</button>
-        </div>
-        <hr>
-        <div class="grid-2">
-            <button onclick="setPower('weapon', this)">🗡️ Weapon</button>
-            <button onclick="setPower('strike', this)">⚡ Smite</button>
-            <button onclick="setPower('fire', this)">🔥 Fire</button>
-            <button onclick="setPower('ice', this)">❄️ Ice</button>
-            <button onclick="setPower('light', this)">✨ Light</button>
-            <button onclick="setPower('wind', this)">🌪️ Wind</button>
+
+        <div class="sidebar-section">
+            <h3>Anime Legends</h3>
+            <div class="grid-2">
+                <button onclick="setPower('spawn-luffy', this)" class="legend-btn">Luffy</button>
+                <button onclick="setPower('spawn-gojo', this)" class="legend-btn">Gojo</button>
+                <button onclick="setPower('spawn-naruto', this)" class="legend-btn">Naruto</button>
+                <button onclick="setPower('spawn-goku', this)" class="legend-btn">Goku</button>
+                <button onclick="setPower('spawn-ichigo', this)" class="legend-btn" style="color:#f39c12">Ichigo</button>
+                <button onclick="setPower('spawn-zoro', this)" class="legend-btn" style="color:#2ecc71">Zoro</button>
+                <button onclick="setPower('spawn-sukuna', this)" class="legend-btn" style="color:#e74c3c">Sukuna</button>
+                <button onclick="setPower('spawn-eren', this)" class="legend-btn" style="color:#bdc3c7">Eren</button>
+            </div>
         </div>
     </div>
 
@@ -112,3 +111,4 @@
     <script src="js/engine.js"></script>
 </body>
 </html>
+
